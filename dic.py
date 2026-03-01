@@ -45,3 +45,7 @@ print("\n")
 for student in students:
    print(f"ชื่อ : {new_student['name']}")
    print(new_student)
+   
+
+cofffeb= []
+cofffeb.append({'name':'depresso', })
