@@ -37,12 +37,13 @@ class Student:
                     print(f"Booking {booking.booking.de} ancelled by {self.name}")
         else:
             print("Booking not found in you list.")
+
     def view_booking(self):
         if not self.bookings:
             print(f"{self.name} has no bookings.")
             return print(f"\n --- Booking for {self.name} --- ")
         for booking in self.bookings:
-            print(f"ID: {self.bookings.booking_id} Room: {booking.classroom.room_number},Date: {booking.date},Time: {booking.time}, Status: {booking.status} ")
+            print(f"ID: {booking.booking_id} Room: {booking.classroom.room_number},Date: {booking.date},Time: {booking.time}, Status: {booking.status} ")
 
 class Classroom:
     def __init__(self,room_number,capacity,equipment):
@@ -101,5 +102,66 @@ class Schedule:
         else:
             print(f"Error: Cannot add booking for {booking.classrom_number} on {booking.date} at {booking.time}")
             return False
+        
+    def remove_booking(self,booking):
+        key = (booking.date,booking.time)
+        if key in self.bookings and self.bookings[key] == booking:
+            del self.bookings[key]
+            return True
+        return False
+    
+    def get_all_bookings(self):
+        return list(self.bookings.values())
+    
+class Admin:
+    def __init__(self,admin_id,name):
+        self.admin_id = admin_id
+        self.name = name
 
-print("Check")
+    def approve_booking(self,booking):
+        if booking.status == "pending":
+            booking.approve()
+        elif booking.status == "approved":
+            print(f"Booking {booking.booking_id} is already approved.")
+        else:
+            print(f"Boking {booking.booking_id} cannot be approved, current status is {booking.status}")
+
+    def cancle_booking(self,booking):
+        if booking.status != "cancelled":
+            booking.cancle()
+            booking.classroomschedule.remove_booking(booking)
+            booking.status.booking.remove(booking)
+            print(f"Admin {self.name} has cancelled Booking {booking.booking_id}.")
+        else:
+            print(f"Booking {booking.booking_id} is already cancelled.")
+
+    def view_all_booking(self,all_classroom):
+        print(f"\n ---All Bookings managed by Admin {self.name} ---")
+        found_bookings = False
+        for classroom in all_classroom:
+            for booking in classroom.schedule.get_all_booking():
+                print(booking)
+                found_bookings = True
+            if not found_bookings:
+                print("no bookings found across all classroom")
+
+print("---เริ่มการจำลองระบบจองห้องเรียน---")
+student1 =Student("S001","Fei","081-234-4567")
+student2 =Student("S002","ling","061-234-4567")
+
+room101 =Classroom("101",30,["Projector","Whiteboard"])
+room102 =Classroom("102",50,["Smartboard","Microphone"])
+
+admin1 =Admin("A001","Zhong")
+
+print("\n---สถานะเริ่มต้น---")
+print(room101)
+print(room102)
+
+booking_Fei_1 = student1.make_booking(room101,"2026-03-01","11:31")
+if booking_Fei_1:
+    student1.view_booking()
+    room101.schedule.get_all_bookings()
+
+
+print("\n --- Check --- \n")
