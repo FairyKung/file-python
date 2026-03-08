@@ -33,15 +33,16 @@ class Student:
                 else:
                     booking.cancle()
                     self.bookings.remove(booking)
-                    booking.classroom.chedule.remove_booking(booking)
-                    print(f"Booking {booking.booking.de} ancelled by {self.name}")
+                    booking.classroom.schedule.remove_booking(booking)
+                    print(f"Booking {booking.booking.id} ancelled by {self.name}")
         else:
             print("Booking not found in you list.")
 
     def view_booking(self):
         if not self.bookings:
             print(f"{self.name} has no bookings.")
-            return print(f"\n --- Booking for {self.name} --- ")
+            print(f"\n --- Booking for {self.name} --- ")
+            return
         for booking in self.bookings:
             print(f"ID: {booking.booking_id} Room: {booking.classroom.room_number},Date: {booking.date},Time: {booking.time}, Status: {booking.status} ")
 
@@ -76,11 +77,11 @@ class Booking:
             
     def approve(self):
         self.status = "approved"
-        print(f"Booking {self.booking_id} for Room {self.classroom.room_number} on {self.data} at {self.time} has been APPROVED.")
+        print(f"Booking {self.booking_id} for Room {self.classroom.room_number} on {self.date} at {self.time} has been APPROVED.")
 
     def cancle(self):
         self.status = "cancelled"
-        print(f"Booking {self.booking_id} for Room {self.classroom.room_number} on {self.data} at {self.time} has been CANCELLED.")
+        print(f"Booking {self.booking_id} for Room {self.classroom.room_number} on {self.date} at {self.time} has been CANCELLED.")
 
     def __str__(self):
         return f"Booking ID: {self.booking_id}, Student: {self.student.name}, Room: {self.classroom.room_number}, Date: {self.date}, Time: {self.time}, Status: {self.status}"
@@ -100,7 +101,7 @@ class Schedule:
             self.bookings[key] = booking
             return True
         else:
-            print(f"Error: Cannot add booking for {booking.classrom_number} on {booking.date} at {booking.time}")
+            print(f"Error: Cannot add booking for {self.classrom_number} on {booking.date} at {booking.time}")
             return False
         
     def remove_booking(self,booking):
@@ -129,8 +130,8 @@ class Admin:
     def cancle_booking(self,booking):
         if booking.status != "cancelled":
             booking.cancle()
-            booking.classroomschedule.remove_booking(booking)
-            booking.status.booking.remove(booking)
+            booking.classroom.schedule.remove_booking(booking)
+            booking.student.bookings.remove(booking)
             print(f"Admin {self.name} has cancelled Booking {booking.booking_id}.")
         else:
             print(f"Booking {booking.booking_id} is already cancelled.")
@@ -139,7 +140,7 @@ class Admin:
         print(f"\n ---All Bookings managed by Admin {self.name} ---")
         found_bookings = False
         for classroom in all_classroom:
-            for booking in classroom.schedule.get_all_booking():
+            for booking in classroom.schedule.get_all_bookings():
                 print(booking)
                 found_bookings = True
             if not found_bookings:
@@ -158,10 +159,38 @@ print("\n---สถานะเริ่มต้น---")
 print(room101)
 print(room102)
 
+#1
 booking_Fei_1 = student1.make_booking(room101,"2026-03-01","11:31")
 if booking_Fei_1:
     student1.view_booking()
     room101.schedule.get_all_bookings()
-
+#2
+booking_ling_1 = student2.make_booking(room101,"2026-03-01","11:31")
+if booking_ling_1:
+    student2.view_booking()
+    room101.schedule.get_all_bookings()
+#3
+booking_ling_2 = student2.make_booking(room102,"2026-03-01","11:31")
+if booking_ling_2:
+    student2.view_booking()
+    room102.schedule.get_all_bookings()
+#4 admin approve
+print("\n Admin อนุมัติการจองของ Fei")
+if booking_Fei_1:
+    admin1.approve_booking(booking_Fei_1)
+    student1.view_booking()
+#5 Fei cancel
+if booking_Fei_1:
+    student1.cancle_booking(booking_Fei_1)
+    student1.view_booking()
+#6
+print("\n Admin ดูการจองทำ้งหมด")
+admin1.view_all_booking([room101,room102])
+#7
+print("Admin ยกเลิกการจองของ ling")
+if booking_ling_2:
+    admin1.cancle_booking(booking_ling_2)
+    student2.view_booking()
+    admin1.view_all_booking([room101,room102])
 
 print("\n --- Check --- \n")
